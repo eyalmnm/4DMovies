@@ -33,7 +33,7 @@ public class A2DPActivity extends Activity {
 
     AudioManager mAudioManager;
     MediaPlayer mPlayer;
-
+    boolean mIsA2dpReady = false;
     BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
         @Override
@@ -61,14 +61,6 @@ public class A2DPActivity extends Activity {
         }
 
     };
-
-    boolean mIsA2dpReady = false;
-
-    void setIsA2dpReady(boolean ready) {
-        mIsA2dpReady = ready;
-        Toast.makeText(this, "A2DP ready ? " + (ready ? "true" : "false"), Toast.LENGTH_SHORT).show();
-    }
-
     private BluetoothProfile.ServiceListener mA2dpListener = new BluetoothProfile.ServiceListener() {
 
         @Override
@@ -91,6 +83,11 @@ public class A2DPActivity extends Activity {
         }
 
     };
+
+    void setIsA2dpReady(boolean ready) {
+        mIsA2dpReady = ready;
+        Toast.makeText(this, "A2DP ready ? " + (ready ? "true" : "false"), Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,7 +132,7 @@ public class A2DPActivity extends Activity {
         try {
             fd = assetManager.openFd("Radioactive.mp3");
             Log.d(TAG, "fd = " + fd);
-            mPlayer.setDataSource(fd.getFileDescriptor(),fd.getStartOffset(),fd.getLength());
+            mPlayer.setDataSource(fd.getFileDescriptor(), fd.getStartOffset(), fd.getLength());
             mPlayer.prepare();
             Log.d(TAG, "start play music");
             mPlayer.start();

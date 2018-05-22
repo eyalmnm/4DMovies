@@ -1,13 +1,5 @@
 package com.em_projects.movies4d.bluetoothchat;
 
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
-import java.util.UUID;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
@@ -18,6 +10,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.io.DataInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.UUID;
 
 public class Piconet {
 
@@ -52,7 +53,9 @@ public class Piconet {
                 default:
                     break;
             }
-        };
+        }
+
+        ;
     };
 
     public Piconet(Context context) {
@@ -77,7 +80,7 @@ public class Piconet {
         Thread connectionProvider = new Thread(new ConnectionProvider());
         connectionProvider.start();
     }
-    
+
     public void startPiconet() {
         Log.d(TAG, " -- Looking devices -- ");
         // The devices must be already paired
@@ -96,97 +99,6 @@ public class Piconet {
             }
         } else {
             Toast.makeText(context, "No paired devices", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private class ConnectionProvider implements Runnable {
-        @Override
-        public void run() {
-            try {
-                for (int i=0; i<mUuidList.size(); i++) {
-                    BluetoothServerSocket myServerSocket = mBluetoothAdapter
-                            .listenUsingRfcommWithServiceRecord(PICONET, mUuidList.get(i));
-                    Log.d(TAG, " ** Opened connection for uuid " + i + " ** ");
-
-                    // This is a blocking call and will only return on a
-                    // successful connection or an exception
-                    Log.d(TAG, " ** Waiting connection for socket " + i + " ** ");
-                    BluetoothSocket myBTsocket = myServerSocket.accept();
-                    Log.d(TAG, " ** Socket accept for uuid " + i + " ** ");
-                    try {
-                        // Close the socket now that the
-                        // connection has been made.
-                        myServerSocket.close();
-                    } catch (IOException e) {
-                        Log.e(TAG, " ** IOException when trying to close serverSocket ** ");
-                    }
-
-                    if (myBTsocket != null) {
-                        String address = myBTsocket.getRemoteDevice().getAddress();
-
-                        mBtSockets.put(address, myBTsocket);
-                        mBtDeviceAddresses.add(address);
-
-                        Thread mBtConnectionThread = new Thread(new BluetoohConnection(myBTsocket));
-                        mBtConnectionThread.start();
-
-                        Log.i(TAG," ** Adding " + address + " in mBtDeviceAddresses ** ");
-                        mBtConnectionThreads.put(address, mBtConnectionThread);
-                    } else {
-                        Log.e(TAG, " ** Can't establish connection ** ");
-                    }
-                }
-            } catch (IOException e) {
-                Log.e(TAG, " ** IOException in ConnectionService:ConnectionProvider ** ", e);
-            }
-        }
-    }
-
-    private class BluetoohConnection implements Runnable {
-        private String address;
-
-        private final InputStream mmInStream;
-
-        public BluetoohConnection(BluetoothSocket btSocket) {
-
-            InputStream tmpIn = null;
-
-            try {
-                tmpIn = new DataInputStream(btSocket.getInputStream());
-            } catch (IOException e) {
-                Log.e(TAG, " ** IOException on create InputStream object ** ", e);
-            }
-            mmInStream = tmpIn;
-        }
-        @Override
-        public void run() {
-            byte[] buffer = new byte[1];
-            String message = "";
-            while (true) {
-
-                try {
-                    int readByte = mmInStream.read();
-                    if (readByte == -1) {
-                        Log.e(TAG, "Discarting message: " + message);
-                        message = "";
-                        continue;
-                    }
-                    buffer[0] = (byte) readByte;
-
-                    if (readByte == 0) { // see terminateFlag on write method
-                        onReceive(message);
-                        message = "";
-                    } else { // a message has been recieved
-                        message += new String(buffer, 0, 1);
-                    }
-                } catch (IOException e) {
-                    Log.e(TAG, " ** disconnected ** ", e);
-                }
-
-                mBtDeviceAddresses.remove(address);
-                mBtSockets.remove(address);
-                mBtConnectionThreads.remove(address);
-            }
         }
     }
 
@@ -245,7 +157,7 @@ public class Piconet {
             Log.e(TAG, " ** Could not connect ** ");
             return;
         }
-        Log.d(TAG, " ** Connection established with " + device.getName() +"! ** ");
+        Log.d(TAG, " ** Connection established with " + device.getName() + "! ** ");
         mBtSockets.put(address, myBtSocket);
         mBtDeviceAddresses.add(address);
         Thread mBluetoohConnectionThread = new Thread(new BluetoohConnection(myBtSocket));
@@ -279,6 +191,97 @@ public class Piconet {
                 outStream.write(new byte[1]);
             } catch (IOException e) {
                 Log.d(TAG, "line 278", e);
+            }
+        }
+    }
+
+    private class ConnectionProvider implements Runnable {
+        @Override
+        public void run() {
+            try {
+                for (int i = 0; i < mUuidList.size(); i++) {
+                    BluetoothServerSocket myServerSocket = mBluetoothAdapter
+                            .listenUsingRfcommWithServiceRecord(PICONET, mUuidList.get(i));
+                    Log.d(TAG, " ** Opened connection for uuid " + i + " ** ");
+
+                    // This is a blocking call and will only return on a
+                    // successful connection or an exception
+                    Log.d(TAG, " ** Waiting connection for socket " + i + " ** ");
+                    BluetoothSocket myBTsocket = myServerSocket.accept();
+                    Log.d(TAG, " ** Socket accept for uuid " + i + " ** ");
+                    try {
+                        // Close the socket now that the
+                        // connection has been made.
+                        myServerSocket.close();
+                    } catch (IOException e) {
+                        Log.e(TAG, " ** IOException when trying to close serverSocket ** ");
+                    }
+
+                    if (myBTsocket != null) {
+                        String address = myBTsocket.getRemoteDevice().getAddress();
+
+                        mBtSockets.put(address, myBTsocket);
+                        mBtDeviceAddresses.add(address);
+
+                        Thread mBtConnectionThread = new Thread(new BluetoohConnection(myBTsocket));
+                        mBtConnectionThread.start();
+
+                        Log.i(TAG, " ** Adding " + address + " in mBtDeviceAddresses ** ");
+                        mBtConnectionThreads.put(address, mBtConnectionThread);
+                    } else {
+                        Log.e(TAG, " ** Can't establish connection ** ");
+                    }
+                }
+            } catch (IOException e) {
+                Log.e(TAG, " ** IOException in ConnectionService:ConnectionProvider ** ", e);
+            }
+        }
+    }
+
+    private class BluetoohConnection implements Runnable {
+        private final InputStream mmInStream;
+        private String address;
+
+        public BluetoohConnection(BluetoothSocket btSocket) {
+
+            InputStream tmpIn = null;
+
+            try {
+                tmpIn = new DataInputStream(btSocket.getInputStream());
+            } catch (IOException e) {
+                Log.e(TAG, " ** IOException on create InputStream object ** ", e);
+            }
+            mmInStream = tmpIn;
+        }
+
+        @Override
+        public void run() {
+            byte[] buffer = new byte[1];
+            String message = "";
+            while (true) {
+
+                try {
+                    int readByte = mmInStream.read();
+                    if (readByte == -1) {
+                        Log.e(TAG, "Discarting message: " + message);
+                        message = "";
+                        continue;
+                    }
+                    buffer[0] = (byte) readByte;
+
+                    if (readByte == 0) { // see terminateFlag on write method
+                        onReceive(message);
+                        message = "";
+                    } else { // a message has been recieved
+                        message += new String(buffer, 0, 1);
+                    }
+                } catch (IOException e) {
+                    Log.e(TAG, " ** disconnected ** ", e);
+                }
+
+                mBtDeviceAddresses.remove(address);
+                mBtSockets.remove(address);
+                mBtConnectionThreads.remove(address);
             }
         }
     }

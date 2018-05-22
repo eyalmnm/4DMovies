@@ -10,18 +10,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class A2dpSinkHelper {
-    private static final String TAG = "A2DPSinkHelper";
-
     /**
      * Profile number for A2DP_SINK profile.
      */
     public static final int A2DP_SINK_PROFILE = 11;
-
     /**
      * Profile number for AVRCP_CONTROLLER profile.
      */
     public static final int AVRCP_CONTROLLER_PROFILE = 12;
-
     /**
      * Intent used to broadcast the change in connection state of the A2DP Sink
      * profile.
@@ -44,7 +40,6 @@ public class A2dpSinkHelper {
      */
     public static final String ACTION_CONNECTION_STATE_CHANGED =
             "android.bluetooth.a2dp-sink.profile.action.CONNECTION_STATE_CHANGED";
-
     /**
      * Intent used to broadcast the change in the Playing state of the A2DP Sink
      * profile.
@@ -65,20 +60,19 @@ public class A2dpSinkHelper {
      */
     public static final String ACTION_PLAYING_STATE_CHANGED =
             "android.bluetooth.a2dp-sink.profile.action.PLAYING_STATE_CHANGED";
-
     /**
      * A2DP sink device is streaming music. This state can be one of
      * {@link BluetoothProfile#EXTRA_STATE} or {@link BluetoothProfile#EXTRA_PREVIOUS_STATE} of
      * {@link #ACTION_PLAYING_STATE_CHANGED} intent.
      */
     public static final int STATE_PLAYING = 10;
-
     /**
      * A2DP sink device is NOT streaming music. This state can be one of
      * {@link BluetoothProfile#EXTRA_STATE} or {@link BluetoothProfile#EXTRA_PREVIOUS_STATE} of
      * {@link #ACTION_PLAYING_STATE_CHANGED} intent.
      */
     public static final int STATE_NOT_PLAYING = 11;
+    private static final String TAG = "A2DPSinkHelper";
 
     public static int getPreviousAdapterState(Intent intent) {
         return intent.getIntExtra(BluetoothAdapter.EXTRA_PREVIOUS_STATE, -1);

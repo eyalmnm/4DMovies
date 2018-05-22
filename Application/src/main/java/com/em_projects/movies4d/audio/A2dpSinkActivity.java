@@ -1,7 +1,6 @@
 package com.em_projects.movies4d.audio;
 
 import android.app.Activity;
-import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothProfile;
@@ -34,15 +33,35 @@ public class A2dpSinkActivity extends Activity {
 
     private static final String UTTERANCE_ID =
             "com.example.androidthings.bluetooth.audio.UTTERANCE_ID";
-
+    /**
+     * Handle an intent that is broadcast by the Bluetooth A2DP sink profile whenever a device
+     * starts or stops playing through the A2DP sink.
+     * Action is {@link A2dpSinkHelper#ACTION_PLAYING_STATE_CHANGED} and
+     * extras describe the old and the new playback states. You can use it to indicate that
+     * there's something playing. You don't need to handle the stream playback by yourself.
+     */
+    private final BroadcastReceiver mSinkProfilePlaybackChangeReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().equals(A2dpSinkHelper.ACTION_PLAYING_STATE_CHANGED)) {
+                int oldState = A2dpSinkHelper.getPreviousProfileState(intent);
+                int newState = A2dpSinkHelper.getCurrentProfileState(intent);
+                BluetoothDevice device = A2dpSinkHelper.getDevice(intent);
+                Log.d(TAG, "Bluetooth A2DP sink changing playback state from " + oldState +
+                        " to " + newState + " device " + device);
+                if (device != null) {
+                    if (newState == A2dpSinkHelper.STATE_PLAYING) {
+                        Log.i(TAG, "Playing audio from device " + device.getAddress());
+                    } else if (newState == A2dpSinkHelper.STATE_NOT_PLAYING) {
+                        Log.i(TAG, "Stopped playing audio from " + device.getAddress());
+                    }
+                }
+            }
+        }
+    };
     private BluetoothAdapter mBluetoothAdapter;
     private BluetoothProfile mA2DPSinkProxy;
-
     private ButtonInputDriver mPairingButtonDriver;
     private ButtonInputDriver mDisconnectAllButtonDriver;
-
-    private TextToSpeech mTtsEngine;
-
     /**
      * Handle an intent that is broadcast by the Bluetooth adapter whenever it changes its
      * state (after calling enable(), for example).
@@ -60,7 +79,7 @@ public class A2dpSinkActivity extends Activity {
             }
         }
     };
-
+    private TextToSpeech mTtsEngine;
     /**
      * Handle an intent that is broadcast by the Bluetooth A2DP sink profile whenever a device
      * connects or disconnects to it.
@@ -82,32 +101,6 @@ public class A2dpSinkActivity extends Activity {
                         speak("Connected to " + deviceName);
                     } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
                         speak("Disconnected from " + deviceName);
-                    }
-                }
-            }
-        }
-    };
-
-    /**
-     * Handle an intent that is broadcast by the Bluetooth A2DP sink profile whenever a device
-     * starts or stops playing through the A2DP sink.
-     * Action is {@link A2dpSinkHelper#ACTION_PLAYING_STATE_CHANGED} and
-     * extras describe the old and the new playback states. You can use it to indicate that
-     * there's something playing. You don't need to handle the stream playback by yourself.
-     */
-    private final BroadcastReceiver mSinkProfilePlaybackChangeReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(A2dpSinkHelper.ACTION_PLAYING_STATE_CHANGED)) {
-                int oldState = A2dpSinkHelper.getPreviousProfileState(intent);
-                int newState = A2dpSinkHelper.getCurrentProfileState(intent);
-                BluetoothDevice device = A2dpSinkHelper.getDevice(intent);
-                Log.d(TAG, "Bluetooth A2DP sink changing playback state from " + oldState +
-                        " to " + newState + " device " + device);
-                if (device != null) {
-                    if (newState == A2dpSinkHelper.STATE_PLAYING) {
-                        Log.i(TAG, "Playing audio from device " + device.getAddress());
-                    } else if (newState == A2dpSinkHelper.STATE_NOT_PLAYING) {
-                        Log.i(TAG, "Stopped playing audio from " + device.getAddress());
                     }
                 }
             }
@@ -221,6 +214,7 @@ public class A2dpSinkActivity extends Activity {
                 mA2DPSinkProxy = proxy;
                 enableDiscoverable();
             }
+
             @Override
             public void onServiceDisconnected(int profile) {
             }
@@ -280,7 +274,7 @@ public class A2dpSinkActivity extends Activity {
             return;
         }
         speak("Disconnecting devices");
-        for (BluetoothDevice device: mA2DPSinkProxy.getConnectedDevices()) {
+        for (BluetoothDevice device : mA2DPSinkProxy.getConnectedDevices()) {
             Log.i(TAG, "Disconnecting device " + device);
             A2dpSinkHelper.disconnect(mA2DPSinkProxy, device);
         }
