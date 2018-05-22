@@ -10,12 +10,20 @@
         android:scaleType="centerCrop"
         android:src="@drawable/snake_bg" />
 
+    <ImageView
+        android:id="@+id/bt_indicator"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_margin="10dp"
+        android:layout_alignParentRight="true"
+        android:src="@drawable/baseline_bluetooth_disabled_black_18dp"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
         android:orientation="vertical" >
 
         <LinearLayout
