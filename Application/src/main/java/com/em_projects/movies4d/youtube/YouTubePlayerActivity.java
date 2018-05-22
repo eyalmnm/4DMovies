@@ -257,12 +257,12 @@ public class YouTubePlayerActivity extends YouTubeBaseActivity
         int millis = mPlayer.getDurationMillis() - mPlayer.getCurrentTimeMillis();
         String formattedTime = formatTime(millis);
         mPlayTimeTextView.setText(formattedTime);
-        int minutes = millis / 60000;
-        int volume =  (minutes % 2) == 0 ? 0 : 10;
-        AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        if (am != null) {
-            am.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
-        }
+//        int minutes = millis / 60000;
+//        int volume =  (minutes % 2) == 0 ? 0 : 10;
+//        AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+//        if (am != null) {
+//            am.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+//        }
     }
 
     private String formatTime(int millis) {
