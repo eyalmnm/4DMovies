@@ -26,9 +26,9 @@ public class YouTubePlayerActivity extends YouTubeBaseActivity
 
     // YouTube player view
     private YouTubePlayerView youTubeView;
-
     private YouTubePlayer mPlayer;
 
+    // UI Components
     private View mPlayButtonLayout;
     private TextView mPlayTimeTextView;
 
