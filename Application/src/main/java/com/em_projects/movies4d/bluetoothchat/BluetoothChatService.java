@@ -75,6 +75,7 @@ public class BluetoothChatService {
      * @param handler A Handler to send messages back to the UI Activity
      */
     public BluetoothChatService(Context context, Handler handler) {
+        Log.d(TAG, "BluetoothChatService");
         mAdapter = BluetoothAdapter.getDefaultAdapter();
         mState = STATE_NONE;
         mNewState = mState;
@@ -245,6 +246,7 @@ public class BluetoothChatService {
      * @see ConnectedThread#write(byte[])
      */
     public void write(byte[] out) {
+        Log.d(TAG, "write");
         // Create temporary object
         ConnectedThread r;
         // Synchronize a copy of the ConnectedThread
@@ -260,6 +262,7 @@ public class BluetoothChatService {
      * Indicate that the connection attempt failed and notify the UI Activity.
      */
     private void connectionFailed() {
+        Log.d(TAG, "connectionFailed");
         // Send a failure message back to the Activity
         Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
@@ -279,6 +282,7 @@ public class BluetoothChatService {
      * Indicate that the connection was lost and notify the UI Activity.
      */
     private void connectionLost() {
+        Log.d(TAG, "connectionLost");
         // Send a failure message back to the Activity
         Message msg = mHandler.obtainMessage(Constants.MESSAGE_TOAST);
         Bundle bundle = new Bundle();
@@ -305,6 +309,7 @@ public class BluetoothChatService {
         private String mSocketType;
 
         public AcceptThread(boolean secure) {
+            Log.d(TAG, "AcceptThread");
             BluetoothServerSocket tmp = null;
             mSocketType = secure ? "Secure" : "Insecure";
 
@@ -333,6 +338,7 @@ public class BluetoothChatService {
 
             // Listen to the server socket if we're not connected
             while (mState != STATE_CONNECTED) {
+                Log.d(TAG, "run -> State not connected");
                 try {
                     // This is a blocking call and will only return on a
                     // successful connection or an exception
@@ -348,12 +354,14 @@ public class BluetoothChatService {
                         switch (mState) {
                             case STATE_LISTEN:
                             case STATE_CONNECTING:
+                                Log.d(TAG, "rum -> switch Listening or Connecting");
                                 // Situation normal. Start the connected thread.
                                 connected(socket, socket.getRemoteDevice(),
                                         mSocketType);
                                 break;
                             case STATE_NONE:
                             case STATE_CONNECTED:
+                                Log.d(TAG, "rum -> switch NONE or Connected");
                                 // Either not ready or already connected. Terminate new socket.
                                 try {
                                     socket.close();

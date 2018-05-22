@@ -33,6 +33,7 @@ import com.em_projects.movies4d.common.logger.Log;
 import com.em_projects.movies4d.common.logger.LogFragment;
 import com.em_projects.movies4d.common.logger.LogWrapper;
 import com.em_projects.movies4d.common.logger.MessageOnlyLogFilter;
+import com.em_projects.movies4d.youtube.YouTubePlayerActivity;
 
 /**
  * A simple launcher activity containing a summary sample description, sample log and a custom
@@ -46,6 +47,7 @@ public class MainActivity extends SampleActivityBase {
     public static final String TAG = "MainActivity";
 
     private static final boolean PLAY_MUSIC_ONLY = false;
+    private static final boolean PLAY_YOUTUBE_ONLY = true;
 
     // Whether the Log Fragment is currently shown
     private boolean mLogShown;
@@ -64,6 +66,10 @@ public class MainActivity extends SampleActivityBase {
 
         if (true == PLAY_MUSIC_ONLY) {
             Intent intent = new Intent(this, A2DPActivity.class);
+            startActivity(intent);
+        }
+        if (true == PLAY_YOUTUBE_ONLY) {
+            Intent intent = new Intent(this, YouTubePlayerActivity.class);
             startActivity(intent);
         }
     }
