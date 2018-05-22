@@ -24,4 +24,9 @@
     <string name="discoverable">Make discoverable</string>
     <string name="intro_message">WellCome to 4DMovies</string>
 
+    <!-- YouTube Player -->
+    <string name="title_logo">Indy Lights from Indianapolis Motor Speedway </string>
+    <string name="btn_skip_intro">Skip Intro</string>
+    <string name="error_player">There was an error initializing the YouTubePlayer (%s)</string>
+
 </resources>
