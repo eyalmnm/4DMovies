@@ -19,24 +19,35 @@ import android.widget.Toast;
 
 import com.em_projects.movies4d.R;
 import com.em_projects.movies4d.config.Constants;
+import com.em_projects.movies4d.utils.IntentUtil;
+import com.em_projects.movies4d.utils.StringUtils;
 import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayer.PlayerStyle;
 import com.google.android.youtube.player.YouTubePlayerView;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class YouTubePlayerActivity extends YouTubeBaseActivity
         implements YouTubePlayer.OnInitializedListener, View.OnClickListener {
     private static final String TAG = "YouTubePlayerActivity";
+
     AudioManager mAudioManager;
     private int maxVolume;
+
     // BlueTooth Components
     private BluetoothAdapter mBtAdapter;
     private BluetoothA2dp mA2dpService;
     private boolean mIsA2dpReady = false;
+
     // YouTube player view
     private YouTubePlayerView youTubeView;
     private YouTubePlayer mPlayer;
+    private String playinVideo = Constants.YOUTUBE_VIDEO_CODE;
+    private final static String reg = "(?:youtube(?:-nocookie)?\\.com\\/(?:[^\\/\\n\\s]+\\/\\S+\\/|(?:v|e(?:mbed)?)\\/|\\S*?[?&]v=)|youtu\\.be\\/)([a-zA-Z0-9_-]{11})";
+
     SeekBar.OnSeekBarChangeListener mVideoSeekBarChangeListener = new SeekBar.OnSeekBarChangeListener() {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -134,7 +145,7 @@ public class YouTubePlayerActivity extends YouTubeBaseActivity
         public void onPlaying() {
             mHandler.postDelayed(runnable, 100);
             displayCurrentTime();
-            AudioManager am = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
             if (am != null) {
                 maxVolume = am.getStreamVolume(AudioManager.STREAM_MUSIC);
             }
@@ -188,6 +199,19 @@ public class YouTubePlayerActivity extends YouTubeBaseActivity
         // attaching layout xml
         setContentView(R.layout.activity_youtube_player);
 
+        // Init Video name
+        Intent intent = getIntent();
+        if (null != intent) {
+            IntentUtil.printIntentData(intent, TAG);
+            String videoName = intent.getStringExtra("android.intent.extra.TEXT");
+            if (null != videoName && videoName.toLowerCase().contains("youtu")) {
+                String videoId = getVideoId(videoName);
+                if (false == StringUtils.isNullOrEmpty(videoId)) {
+                    playinVideo = videoId;
+                }
+            }
+        }
+
         // Initializing YouTube player view
         YouTubePlayerView youTubePlayerView = (YouTubePlayerView) findViewById(R.id.youtube_view);
         youTubePlayerView.initialize(Constants.DEVELOPER_KEY, this);
@@ -213,6 +237,18 @@ public class YouTubePlayerActivity extends YouTubeBaseActivity
         bt_indicator = findViewById(R.id.bt_indicator);
     }
 
+    public static String getVideoId(String videoUrl) {
+        if (videoUrl == null || videoUrl.trim().length() <= 0)
+            return null;
+
+        Pattern pattern = Pattern.compile(reg, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(videoUrl);
+
+        if (matcher.find())
+            return matcher.group(1);
+        return null;
+    }
+
     @Override
     public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult result) {
         Toast.makeText(this, "Failed to initialize.", Toast.LENGTH_LONG).show();
@@ -227,7 +263,7 @@ public class YouTubePlayerActivity extends YouTubeBaseActivity
 
         // Start buffering
         if (!wasRestored) {
-            player.cueVideo(Constants.YOUTUBE_VIDEO_CODE);
+            player.cueVideo(playinVideo);
         }
 
         player.setPlayerStyle(PlayerStyle.CHROMELESS);

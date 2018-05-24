@@ -52,10 +52,17 @@
             android:theme="@style/AppTheme" />
 
         <!-- YouTube Activity -->
+        <!-- Ref: https://stackoverflow.com/questions/35591413/make-my-app-appear-in-youtube-share -->
         <activity
             android:name=".youtube.YouTubePlayerActivity"
             android:configChanges="orientation|keyboardHidden"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
 
     </application>
 
